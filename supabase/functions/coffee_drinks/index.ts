@@ -30,6 +30,31 @@ serve(async (req: Request) => {
       return new Response(JSON.stringify({ success: true, message: "Coffee drink added!" }), { headers });
     }
 
+    // Handle PUT request - update an existing coffee drink
+    if (req.method === "PUT") {
+      const { drink_id, name, description, rating } = await req.json();
+      const { data, error } = await supabase
+          .from("coffee_drinks")
+          .update({ name, description, rating })
+          .eq("drink_id", drink_id)
+          .select();
+
+      if (error) throw error;
+      return new Response(JSON.stringify({ success: true, data }), { headers });
+    }
+
+    // Handle DELETE request - delete a coffee drink
+    if (req.method === "DELETE") {
+      const { drink_id } = await req.json();
+      const { error } = await supabase
+          .from("coffee_drinks")
+          .delete()
+          .eq("drink_id", drink_id);
+
+      if (error) throw error;
+      return new Response(JSON.stringify({ success: true, message: "Coffee drink deleted!" }), { headers });
+    }
+
     // Handle unsupported methods
     return new Response(JSON.stringify({ error: "Method not allowed" }), { 
       status: 405, 

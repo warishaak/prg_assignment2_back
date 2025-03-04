@@ -10,37 +10,37 @@ serve(async (req: Request) => {
   const headers = { "Content-Type": "application/json" };
 
   try {
-    // Handle GET request - fetch photos
+    // Handle GET request - fetch coffee drinks
     if (req.method === "GET") {
       const { data, error } = await supabase
-          .from("photos")
-          .select("*")
-          .order("created_at", { ascending: false });
+        .from("coffee_drinks")
+        .select("*")
+        .order("created_at", { ascending: false });
 
       if (error) throw error;
       return new Response(JSON.stringify(data), { headers });
     }
 
-    // Handle POST request - add a new photo
+    // Handle POST request - add a new coffee drink
     if (req.method === "POST") {
-      const { url, description } = await req.json();
-      const { error } = await supabase.from("photos").insert([{ url, description }]);
-
+      const { name, description, rating } = await req.json();
+      const { error } = await supabase.from("coffee_drinks").insert([{ name, description, rating }]);
+      
       if (error) throw error;
-      return new Response(JSON.stringify({ success: true, message: "Photo added!" }), { headers });
+      return new Response(JSON.stringify({ success: true, message: "Coffee drink added!" }), { headers });
     }
 
     // Handle unsupported methods
-    return new Response(JSON.stringify({ error: "Method not allowed" }), {
-      status: 405,
-      headers
+    return new Response(JSON.stringify({ error: "Method not allowed" }), { 
+      status: 405, 
+      headers 
     });
-
+    
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : "Unknown error";
-    return new Response(JSON.stringify({ error: errorMessage }), {
-      status: 500,
-      headers
+    return new Response(JSON.stringify({ error: errorMessage }), { 
+      status: 500, 
+      headers 
     });
   }
 });
