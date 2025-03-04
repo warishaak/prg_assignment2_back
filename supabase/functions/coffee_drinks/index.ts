@@ -12,6 +12,22 @@ serve(async (req: Request) => {
   try {
     // Handle GET request - fetch coffee drinks
     if (req.method === "GET") {
+      const pathParts = new URL(req.url).pathname.split('/');
+      const id = pathParts[pathParts.length - 1];
+
+      // If ID is provided and not the base endpoint, fetch single drink
+      if (id && id !== 'coffee_drinks') {
+        const { data, error } = await supabase
+            .from("coffee_drinks")
+            .select("*")
+            .eq("id", id)
+            .single();
+
+        if (error) throw error;
+        return new Response(JSON.stringify(data), { headers });
+      }
+
+      // Fetch all drinks
       const { data, error } = await supabase
           .from("coffee_drinks")
           .select("*")
@@ -33,12 +49,24 @@ serve(async (req: Request) => {
       return new Response(JSON.stringify({ success: true, data }), { headers });
     }
 
-    // Handle PUT request - update an existing coffee drink
-    if (req.method === "PUT") {
-      const { id, name, description, rating } = await req.json();
+    // Handle DELETE request - delete a coffee drink
+    if (req.method === "DELETE") {
+      const id = new URL(req.url).pathname.split('/').pop();
+      const { error } = await supabase
+          .from("coffee_drinks")
+          .delete()
+          .eq("id", id);
+
+      if (error) throw error;
+      return new Response(JSON.stringify({ success: true, message: "Coffee drink deleted!" }), { headers });
+    }
+    if (req.method === "PUT" || req.method === "PATCH") {
+      const id = new URL(req.url).pathname.split('/').pop();
+      const updates = await req.json();
+
       const { data, error } = await supabase
           .from("coffee_drinks")
-          .update({ name, description, rating })
+          .update(updates)
           .eq("id", id)
           .select();
 
@@ -46,17 +74,6 @@ serve(async (req: Request) => {
       return new Response(JSON.stringify({ success: true, data }), { headers });
     }
 
-    // Handle DELETE request - delete a coffee drink
-    if (req.method === "DELETE") {
-      const id = new URL(req.url).pathname.split('/').pop();
-      const { error } = await supabase
-          .from("coffee_drinks")
-          .delete()
-          .eq("id", id); 
-
-      if (error) throw error;
-      return new Response(JSON.stringify({ success: true, message: "Coffee drink deleted!" }), { headers });
-    }
 
     // Handle unsupported methods
     return new Response(JSON.stringify({ error: "Method not allowed" }), {
