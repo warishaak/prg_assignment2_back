@@ -13,9 +13,9 @@ serve(async (req: Request) => {
     // Handle GET request - fetch coffee drinks
     if (req.method === "GET") {
       const { data, error } = await supabase
-        .from("coffee_drinks")
-        .select("*")
-        .order("created_at", { ascending: false });
+          .from("coffee_drinks")
+          .select("*")
+          .order("created_at", { ascending: false });
 
       if (error) throw error;
       return new Response(JSON.stringify(data), { headers });
@@ -24,18 +24,21 @@ serve(async (req: Request) => {
     // Handle POST request - add a new coffee drink
     if (req.method === "POST") {
       const { name, description, rating } = await req.json();
-      const { error } = await supabase.from("coffee_drinks").insert([{ name, description, price, rating, created_at }]);
-      
+      const { data, error } = await supabase
+          .from("coffee_drinks")
+          .insert([{ name, description, rating }])
+          .select();
+
       if (error) throw error;
-      return new Response(JSON.stringify({ success: true, message: "Coffee drink added!" }), { headers });
+      return new Response(JSON.stringify({ success: true, data }), { headers });
     }
 
     // Handle PUT request - update an existing coffee drink
     if (req.method === "PUT") {
-      const { id, name, description, price, rating } = await req.json();
+      const { id, name, description, rating } = await req.json();
       const { data, error } = await supabase
           .from("coffee_drinks")
-          .update({ name, description, price, rating })
+          .update({ name, description, rating })
           .eq("id", id)
           .select();
 
@@ -45,27 +48,27 @@ serve(async (req: Request) => {
 
     // Handle DELETE request - delete a coffee drink
     if (req.method === "DELETE") {
-      const { id } = await req.json();
+      const id = new URL(req.url).pathname.split('/').pop();
       const { error } = await supabase
           .from("coffee_drinks")
           .delete()
-          .eq("id",id);
+          .eq("id", id); 
 
       if (error) throw error;
       return new Response(JSON.stringify({ success: true, message: "Coffee drink deleted!" }), { headers });
     }
 
     // Handle unsupported methods
-    return new Response(JSON.stringify({ error: "Method not allowed" }), { 
-      status: 405, 
-      headers 
+    return new Response(JSON.stringify({ error: "Method not allowed" }), {
+      status: 405,
+      headers
     });
-    
+
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : "Unknown error";
-    return new Response(JSON.stringify({ error: errorMessage }), { 
-      status: 500, 
-      headers 
+    return new Response(JSON.stringify({ error: errorMessage }), {
+      status: 500,
+      headers
     });
   }
 });
