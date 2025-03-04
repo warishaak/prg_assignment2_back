@@ -24,7 +24,7 @@ serve(async (req: Request) => {
     // Handle POST request - add a new coffee drink
     if (req.method === "POST") {
       const { name, description, rating } = await req.json();
-      const { error } = await supabase.from("coffee_drinks").insert([{ name, description, rating }]);
+      const { error } = await supabase.from("coffee_drinks").insert([{ name, description, price, rating, created_at }]);
       
       if (error) throw error;
       return new Response(JSON.stringify({ success: true, message: "Coffee drink added!" }), { headers });
@@ -32,11 +32,11 @@ serve(async (req: Request) => {
 
     // Handle PUT request - update an existing coffee drink
     if (req.method === "PUT") {
-      const { drink_id, name, description, rating } = await req.json();
+      const { id, name, description, price, rating } = await req.json();
       const { data, error } = await supabase
           .from("coffee_drinks")
-          .update({ name, description, rating })
-          .eq("drink_id", drink_id)
+          .update({ name, description, price, rating })
+          .eq("id", id)
           .select();
 
       if (error) throw error;
@@ -45,11 +45,11 @@ serve(async (req: Request) => {
 
     // Handle DELETE request - delete a coffee drink
     if (req.method === "DELETE") {
-      const { drink_id } = await req.json();
+      const { id } = await req.json();
       const { error } = await supabase
           .from("coffee_drinks")
           .delete()
-          .eq("drink_id", drink_id);
+          .eq("id",id);
 
       if (error) throw error;
       return new Response(JSON.stringify({ success: true, message: "Coffee drink deleted!" }), { headers });
