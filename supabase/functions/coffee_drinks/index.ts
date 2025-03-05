@@ -39,10 +39,10 @@ serve(async (req: Request) => {
 
     // Handle POST request - add a new coffee drink
     if (req.method === "POST") {
-      const { name, description, rating } = await req.json();
+      const { name, coffee_shop, rating } = await req.json();
       const { data, error } = await supabase
           .from("coffee_drinks")
-          .insert([{ name, description, rating }])
+          .insert([{ name, coffee_shop, rating }])
           .select();
 
       if (error) throw error;
