@@ -22,18 +22,34 @@ serve(async (req: Request) => {
 
     // Handle POST request - upload photo
     if (req.method === "POST") {
-      const { fileName, fileData } = await req.json();
+      const formData = await req.formData();
+      const file = formData.get('photo') as File;
 
-      const { data, error } = await supabase
+      if (!file) {
+        return new Response(
+            JSON.stringify({success: false, error: "No file provided"}),
+            {status: 400, headers}
+        );
+      }
+
+      // Create a unique filename with PNG extension
+      const fileName = `coffee-photos_${Date.now()}.png`;
+
+      // Convert File to ArrayBuffer for proper binary upload
+      const arrayBuffer = await file.arrayBuffer();
+      const fileBuffer = new Uint8Array(arrayBuffer);
+
+      const {data, error} = await supabase
           .storage
           .from('coffee-photos')
-          .upload(fileName, fileData, {
+          .upload(fileName, fileBuffer, {
             cacheControl: '3600',
-            upsert: false
-          });
-
+            upsert: false,
+            contentType: 'image/png'  // Always use PNG content type
+           });
+           
       if (error) throw error;
-      return new Response(JSON.stringify({ success: true, data }), { headers });
+      return new Response(JSON.stringify({success: true, data}), {headers});
     }
 
     // Handle DELETE request - delete photo
