@@ -1,6 +1,14 @@
-# APA1 Supa Task Backend
+# Backend
 
-This is where you'll design and deploy your API for access by your frontend
+A Supabase Edge Functions API for managing coffee drinks and photos, providing a complete backend solution for a coffee tracking application.
+
+## Overview
+
+This backend service provides REST API endpoints for:
+- Managing coffee drink entries (CRUD operations)
+- Handling coffee photos (upload, retrieve, delete)
+
+The API is built using Supabase Edge Functions and leverages Supabase Storage for photo management.
 
 ## Prerequisites
 
@@ -29,7 +37,7 @@ cd <repository-name>
 The first step is to authenticate with Supabase:
 
 ```bash
-supabase login
+npx supabase login
 ```
 
 This will open a browser window where you can authenticate with Supabase and generate an access token.
@@ -39,21 +47,53 @@ This will open a browser window where you can authenticate with Supabase and gen
 Once authenticated, link your local project to your Supabase project:
 
 ```bash
-supabase link --project-ref your_project_id
+npx supabase link --project-ref your_project_id
 ```
-
-### 5. Working with Edge Functions
-
-**Creating a New Edge Function**
-
-```bash
-supabase functions new my-function-name
-```
-
-This creates a new function in supabase/functions/my-function-name/
 
 **Deploying your Edge functions**
 
 ```bash
-supabase functions deploy
+npx supabase functions deploy
 ```
+This will deploy both the coffee_drinks and photos functions to your Supabase project.
+
+### 5. Testing
+
+The project includes comprehensive test coverage for both Edge Functions:
+
+```bash
+cd supabase/functions/coffee_drinks
+deno test --allow-env --allow-net
+
+cd ../photos
+deno test --allow-env --allow-net
+```
+**Test Coverage**
+
+The test suite covers:
+
+- ✅ Retrieving all coffee drinks
+- ✅ Creating new coffee drinks
+- ✅ Updating existing coffee drinks
+- ✅ Deleting coffee drinks
+- ✅ Retrieving all photos
+- ✅ Uploading photos (with format validation)
+- ✅ Deleting photos
+- ✅ Error handling for invalid methods
+
+### 4. Database Schema
+
+The application uses the following Supabase table structure:
+
+**coffee_drinks**
+
+- id: UUID (primary key)
+- name: String (coffee drink name)
+- coffee_shop: String (shop where the coffee was purchased)
+- rating: Number (1-5 rating)
+- created_at: Timestamp (auto-generated)
+
+**Storage Structure**
+
+Photos are stored in the coffee-photos bucket within Supabase Storage.
+
