@@ -24,12 +24,24 @@ serve(async (req: Request) => {
     if (req.method === "POST") {
       const { fileName, fileData } = await req.json();
 
-      const { data, error } = await supabase
-          .storage
-          .from('coffee-photos')
-          .upload(fileName, fileData, {
-            cacheControl: '3600',
-            upsert: false
+      // Check if the file is a PNG
+      if (!fileName.toLowerCase().endsWith(".png")) {
+        return new Response(JSON.stringify({
+          error: "Only PNG files are allowed"
+        }), {
+          status: 400,
+          headers
+        });
+      }
+
+      // Convert base64 string to Uint8Array
+      const binaryData = Uint8Array.from(atob(fileData), c => c.charCodeAt(0));
+
+      const { data, error } = await supabase.storage
+          .from("coffee-photos")
+          .upload(fileName, binaryData, {
+            contentType: "image/png",
+            upsert: true
           });
 
       if (error) throw error;
