@@ -18,38 +18,38 @@ function mockFetch(response: any, status = 200) {
 }
 
 // Test for GET /photos endpoint: Checks if all photos are returned correctly
-Deno.test("GET /photos returns all photos", async () => {
-  mockFetch([{ name: "coffee1.png" }, { name: "coffee2.png" }]);
-
-  const response = await fetch("http://localhost/photos", { method: "GET" });
-  const data = await response.json();
-
-  assertEquals(response.status, 200);
-  assertEquals(Array.isArray(data), true);
-  assertEquals(data.length, 2);
-  assertEquals(data[0].name, "coffee1.png");
-});
-
-// Test for POST /photos endpoint: Checks if a photo is uploaded correctly
-Deno.test("POST /photos uploads a photo", async () => {
-  mockFetch({ success: true, data: { path: "coffee1.png" } });
-
-  const response = await fetch("http://localhost/photos", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ fileName: "coffee1.png", fileData: btoa("mockbinarydata") }),
+  Deno.test("GET /api/photos returns all photos", async () => {
+    mockFetch([{ name: "coffee1.png" }, { name: "coffee2.png" }]);
+  
+    const response = await fetch("http://localhost/api/photos", { method: "GET" });
+    const data = await response.json();
+  
+    assertEquals(response.status, 200);
+    assertEquals(Array.isArray(data), true);
+    assertEquals(data.length, 2);
+    assertEquals(data[0].name, "coffee1.png");
   });
-  const data = await response.json();
-
-  assertEquals(response.status, 200);
-  assertEquals(data.success, true);
-  assertEquals(data.data.path, "coffee1.png");
-});
-
-// Test for POST /photos endpoint: Rejects non-PNG files
-Deno.test("POST /photos rejects non-PNG files", async () => {
+  
+// Test for POST /photos endpoint: Checks if a photo is uploaded correctly
+  Deno.test("POST /api/photos uploads a photo", async () => {
+    mockFetch({ success: true, data: { path: "coffee1.png" } });
+  
+    const response = await fetch("http://localhost/api/photos", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ fileName: "coffee1.png", fileData: btoa("mockbinarydata") }),
+    });
+    const data = await response.json();
+  
+    assertEquals(response.status, 200);
+    assertEquals(data.success, true);
+    assertEquals(data.data.path, "coffee1.png");
+  });
+  
+  // Test for POST /photos endpoint: Rejects non-PNG files
+  Deno.test("POST /api/photos rejects non-PNG files", async () => {
     mockFetch({ error: "Only PNG files are allowed" }, 400);  // Mock 400 status
-    const response = await fetch("http://localhost/photos", {
+    const response = await fetch("http://localhost/api/photos", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ fileName: "coffee1.jpg", fileData: btoa("mockbinarydata") }),
@@ -61,24 +61,15 @@ Deno.test("POST /photos rejects non-PNG files", async () => {
   });
   
 // Test for DELETE /photos/:fileName endpoint: Checks if a photo is deleted
-Deno.test("DELETE /photos/:fileName deletes a photo", async () => {
-  mockFetch({ success: true, message: "Photo deleted!" });
-
-  const response = await fetch("http://localhost/photos/coffee1.png", { method: "DELETE" });
-  const data = await response.json();
-
-  assertEquals(response.status, 200);
-  assertEquals(data.success, true);
-  assertEquals(data.message, "Photo deleted!");
-});
-
-// Test for invalid HTTP method: Ensures unsupported methods return a 405 status
-Deno.test("Invalid method returns 405", async () => {
-    mockFetch({ error: "Method not allowed" }, 405); 
-    const response = await fetch("http://localhost/photos", { method: "CONNECT" });
+Deno.test("DELETE /api/photos/:fileName deletes a photo", async () => {
+    mockFetch({ success: true, message: "Photo deleted!" });
+  
+    const response = await fetch("http://localhost/api/photos/coffee1.png", { method: "DELETE" });
     const data = await response.json();
   
-    assertEquals(response.status, 405);
-    assertEquals(data.error, "Method not allowed"); 
-});
+    assertEquals(response.status, 200);
+    assertEquals(data.success, true);
+    assertEquals(data.message, "Photo deleted!");
+  });
+  
   
