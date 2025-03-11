@@ -15,6 +15,8 @@ The API is built using Supabase Edge Functions and leverages Supabase Storage fo
 - [Node.js](https://nodejs.org/) (v16 or newer)
 - [Supabase CLI](https://supabase.com/docs/guides/cli)
 - [curl](https://curl.se/) for testing functions locally
+- [Deno](https://deno.com/manual/getting_started/installation) (for local development and testing)
+
 
 ## Getting Started
 
