@@ -17,6 +17,7 @@ function mockFetch(response: any, status = 200) {
     new Response(JSON.stringify(response), { status });
 }
 
+// Test for GET /coffee_drinks: Ensures that all coffee drinks are returned
 Deno.test("GET /coffee_drinks returns all coffee drinks", async () => {
   mockFetch([{ id: 1, name: "Latte", coffee_shop: "Brew Cafe", rating: 5 }]);
 
@@ -29,6 +30,7 @@ Deno.test("GET /coffee_drinks returns all coffee drinks", async () => {
   assertEquals(data[0].name, "Latte");
 });
 
+// Test for POST /coffee_drinks: Ensures that a new coffee drink is created successfully
 Deno.test("POST /coffee_drinks creates a new coffee drink", async () => {
   mockFetch({ success: true, data: { id: 2, name: "Espresso", coffee_shop: "Roast House", rating: 4 } });
 
@@ -44,6 +46,7 @@ Deno.test("POST /coffee_drinks creates a new coffee drink", async () => {
   assertEquals(data.data.name, "Espresso");
 });
 
+// Test for DELETE /coffee_drinks/:id: Ensures that a coffee drink is deleted correctly
 Deno.test("DELETE /coffee_drinks/:id deletes a coffee drink", async () => {
   mockFetch({ success: true, message: "Coffee drink deleted!" });
 
@@ -55,6 +58,7 @@ Deno.test("DELETE /coffee_drinks/:id deletes a coffee drink", async () => {
   assertEquals(data.message, "Coffee drink deleted!");
 });
 
+// Test for PUT /coffee_drinks/:id: Ensures that a coffee drink is updated correctly
 Deno.test("PUT /coffee_drinks/:id updates a coffee drink", async () => {
   mockFetch({ success: true, data: { id: 1, name: "Cappuccino", coffee_shop: "Cafe Bliss", rating: 5 } });
 
